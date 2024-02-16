@@ -120,6 +120,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
 
         $("#clientes").DataTable({
             "responsive": true,"paging": true,"lengthChange": false, "autoWidth": false,
+            "order": [[0, 'desc']],
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#_wrapper .col-md-6:eq(0)');
 

@@ -1,13 +1,11 @@
 <?php
+$id_venta_get = $_GET['id_venta'];
 include('../app/config.php');
-
 include('../layout/sesion.php');
 
 include('../layout/parte1.php');
-
-include('../app/controllers/almacen/listado_de_productos.php');
-include('../app/controllers/ventas/listado_de_ventas.php');
-include('../app/controllers/clientes/listado_de_clientes.php');
+include('../app/controllers/ventas/cargar_venta.php');
+include('../app/controllers/clientes/cargar_cliente.php');
 
 
 ?>
@@ -43,22 +41,8 @@ include('../app/controllers/clientes/listado_de_clientes.php');
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <?php
-                    if(isset($_SESSION['msj'])){
-                        $respuesta = $_SESSION['msj']; ?>
-                        <script>
-                            Swal.fire({
-                                title: '<?php echo $respuesta; ?>',
-                                icon: 'success',
-                                timer: 2000,
-                                buttons: false,
-                            })
-                        </script>
-                        <?php
-                        unset($_SESSION['msj']);
-                    }
-                    ?>
+                <div class="col-sm-12">
+                    <h1>Detalle de la venta nro <?= $nro_venta; ?> </h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -86,7 +70,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
 
                             <h4 class="card-title">
                                 <i class="nav-icon fas fa-shopping-bag"></i> Venta Nro
-                                <input type="text" class="text-center" value="<?php echo $contador_de_ventas + 1; ?>" disabled>
+                                <input type="text" class="text-center" value="<?= $nro_venta; ?>" disabled>
                             </h4>
 
                             <div class="card-tools">
@@ -102,12 +86,6 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                             <!-- /.card-body -->
                             <b>Carrito</b>
 
-                            <button class="btn btn-primary ml-3" data-toggle="modal"
-                                    data-target="#modal-buscar_producto">
-                                <i class="fa fa-search"></i>
-                                Buscar producto
-                            </button>
-
                             <div class="table-responsive mt-4">
                                 <table class="table table-bordered table-sm table-hover table-striped">
                                     <thead>
@@ -117,7 +95,6 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                         <th class="tbl_prods">Cantidad</th>
                                         <th class="tbl_prods">Precio Unitario</th>
                                         <th class="tbl_prods">Precio SubTotal</th>
-                                        <th class="tbl_prods">Acciones</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -127,11 +104,10 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                     $precio_unitario_total = 0;
                                     $precio_total = 0;
 
-                                    $nro_venta = $contador_de_ventas + 1;
                                     $sql_carrito = "SELECT *,pro.nombre as nombre_producto, pro.descripcion as descripcion, pro.precio_venta as precio_venta,
                                                     pro.stock as stock, pro.id_producto as id_producto
                                                     FROM tb_carrito AS carr INNER JOIN tb_almacen as pro 
-                                                    ON carr.id_producto = pro.id_producto WHERE nro_venta = '$nro_venta' ";
+                                                    ON carr.id_producto = pro.id_producto WHERE nro_venta = '$nro_venta' ORDER BY id_carrito ASC";
                                     $query_carrito = $pdo->prepare($sql_carrito);
                                     $query_carrito->execute();
                                     $carrito_datos = $query_carrito->fetchAll(PDO::FETCH_ASSOC);
@@ -149,10 +125,10 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                             <td><?php echo $carrito_dato['nombre_producto']; ?></td>
                                             <td>
                                                 <center>
-                                                        <span id="cantidad_carrito<?php echo $contador_de_carrito; ?>"><?php echo $carrito_dato['cantidad'] ?></span>
+                                                    <span id="cantidad_carrito<?php echo $contador_de_carrito; ?>"><?php echo $carrito_dato['cantidad'] ?></span>
 
-                                                        <input type="text" value="<?php echo $carrito_dato['stock']?>"
-                                                               id="stock_de_inventario<?php echo $contador_de_carrito; ?>" hidden>
+                                                    <input type="text" value="<?php echo $carrito_dato['stock']?>"
+                                                           id="stock_de_inventario<?php echo $contador_de_carrito; ?>" hidden>
 
                                                 </center>
                                             </td>
@@ -168,18 +144,9 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                                 </center>
                                             </td>
 
-                                            <td><center>
-                                                <form action="../app/controllers/ventas/borrar_carrito.php" method="post">
-                                                    <input type="text" name="id_carrito" value="<?php echo $id_carrito; ?>"hidden>
-                                                    <button type="submit" class="btn btn-danger btn-sm">
-                                                        <i class="fa fa-trash"></i> Borrar
-                                                    </button>
-                                                </form>
-                                                </center>
-                                            </td>
 
                                         </tr>
-                                    <?php
+                                        <?php
                                     }
                                     ?>
                                     <tr>
@@ -228,12 +195,6 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                 Cliente
                             </h4>
 
-                            <button class="btn btn-primary ml-3" data-toggle="modal"
-                                    data-target="#modal-lg">
-                                <i class="fa fa-search"></i>
-                                Buscar cliente
-                            </button>
-
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
@@ -242,30 +203,50 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                             <!-- /.card-tools -->
                         </div>
 
+                        <?php
+                        foreach ($clientes_datos as $clientes_dato) {
+                            $nombre_cliente = $clientes_dato['nombre_cliente'];
+                            $rut_cliente = $clientes_dato['rut_cliente'];
+                            $ciudad_cliente = $clientes_dato['ciudad_cliente'];
+                            $telefono_movil = $clientes_dato['telefono_movil'];
+                        }
+                        ?>
+
+
                         <!-- /.card-header -->
                         <div class="card-body">
                             <!-- /.card-body -->
                             <div class="row mt-3">
-
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <input type="text" id="id_cliente" hidden>
-                                        <label>Nombre Cliente</label>
-                                        <input type="text" id="nombre_cliente" class="form-control" disabled>
+                                        <label>Nombre / Razon Social</label>
+                                        <input type="text" value="<?php echo $nombre_cliente; ?>"
+                                               id="nombre_cliente" class="form-control" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Rut Empresa</label>
+                                        <input type="text" value="<?php echo $rut_cliente; ?>"
+                                               id="rut_cliente" class="form-control" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Ciudad </label>
+                                        <input type="text" value="<?php echo $ciudad_cliente; ?>"
+                                               id="ciudad_cliente" class="form-control" disabled>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Rut cliente</label>
-                                        <input type="text" id="rut_cliente" class="form-control" disabled>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="form-group">
                                         <label>Celular </label>
-                                        <input type="text" id="telefono_movil" class="form-control" disabled>
+                                        <input type="text" value="<?php echo $telefono_movil; ?>"
+                                               id="telefono_movil" class="form-control" disabled>
                                     </div>
                                 </div>
 
@@ -292,7 +273,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                             </div>
 
                         </div>
-                            <!-- /.card-tools -->
+                        <!-- /.card-tools -->
 
                         <div class="card-body">
                             <div class="form-group">
@@ -344,7 +325,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                         function guardar_venta() {
                                             var url = "../app/controllers/ventas/registro_de_ventas.php";
                                             $.get(url,{nro_venta:nro_venta,id_cliente:id_cliente,total_pagado:total_pagado},function (datos) {
-                                               $('#respuesta_registro_venta').html(datos);
+                                                $('#respuesta_registro_venta').html(datos);
                                             });
                                         }
                                     });
@@ -355,17 +336,17 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                             <div id="respuesta_registro_venta"></div>
 
                         </div>
-                        </div>
                     </div>
-
                 </div>
 
             </div>
 
         </div>
 
+    </div>
 
-    </div><!-- /.container-fluid -->
+
+</div><!-- /.container-fluid -->
 
 <div class="modal fade" id="modal-lg">
     <div class="modal-dialog modal-lg">
@@ -402,35 +383,35 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                         foreach ($clientes_datos as $clientes_dato) {
                             $id_cliente = $clientes_dato['id_cliente'];
                             $contador_de_clientes = $contador_de_clientes + 1; ?>
-                        <tr>
-                            <td><center><?php echo $contador_de_clientes; ?></center></td>
-                            <td>
-                                <center>
-                                    <button id="btn_pasar_cliente<?php echo $id_cliente; ?>" class="btn btn-info">Seleccionar</button>
-                                    <script>
-                                        $('#btn_pasar_cliente<?php echo $id_cliente;?>').click(function () {
+                            <tr>
+                                <td><center><?php echo $contador_de_clientes; ?></center></td>
+                                <td>
+                                    <center>
+                                        <button id="btn_pasar_cliente<?php echo $id_cliente; ?>" class="btn btn-info">Seleccionar</button>
+                                        <script>
+                                            $('#btn_pasar_cliente<?php echo $id_cliente;?>').click(function () {
 
-                                            var id_cliente = '<?php echo $clientes_dato['id_cliente']; ?>';
-                                            $('#id_cliente').val(id_cliente);
+                                                var id_cliente = '<?php echo $clientes_dato['id_cliente']; ?>';
+                                                $('#id_cliente').val(id_cliente);
 
-                                            var nombre_cliente = '<?php echo $clientes_dato['nombre_cliente']; ?>';
-                                            $('#nombre_cliente').val(nombre_cliente);
+                                                var nombre_cliente = '<?php echo $clientes_dato['nombre_cliente']; ?>';
+                                                $('#nombre_cliente').val(nombre_cliente);
 
-                                            var rut_cliente = '<?php echo $clientes_dato['rut_cliente']; ?>';
-                                            $('#rut_cliente').val(rut_cliente);
+                                                var rut_cliente = '<?php echo $clientes_dato['rut_cliente']; ?>';
+                                                $('#rut_cliente').val(rut_cliente);
 
-                                            var telefono_movil = '<?php echo $clientes_dato['telefono_movil']; ?>';
-                                            $('#telefono_movil').val(telefono_movil);
+                                                var telefono_movil = '<?php echo $clientes_dato['telefono_movil']; ?>';
+                                                $('#telefono_movil').val(telefono_movil);
 
-                                            $('#modal-lg').modal('toggle');
-                                        });
-                                    </script>
-                                </center>
-                            </td>
-                            <td><?php echo $clientes_dato['nombre_cliente']; ?></td>
-                            <td><?php echo $clientes_dato['rut_cliente']; ?></td>
-                            <td><?php echo $clientes_dato['telefono_movil']; ?></td>
-                        </tr>
+                                                $('#modal-lg').modal('toggle');
+                                            });
+                                        </script>
+                                    </center>
+                                </td>
+                                <td><?php echo $clientes_dato['nombre_cliente']; ?></td>
+                                <td><?php echo $clientes_dato['rut_cliente']; ?></td>
+                                <td><?php echo $clientes_dato['telefono_movil']; ?></td>
+                            </tr>
                             <?php
                         }
                         ?>
@@ -545,31 +526,31 @@ include('../layout/parte2.php');
                         </div>
                     </div>
 
-                <div class="col-md-5">
-                    <div class="form-group">
-                        <label>Descripcion</label>
-                        <input type="text" id="descripcion" class="form-control" disabled>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label>Descripcion</label>
+                            <input type="text" id="descripcion" class="form-control" disabled>
+                        </div>
                     </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="text" id="cantidad" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Precio Unitario</label>
+                            <input type="text" id="precio_venta" class="form-control" disabled>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label>Cantidad</label>
-                        <input type="text" id="cantidad" class="form-control">
-                    </div>
-                </div>
-
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label>Precio Unitario</label>
-                        <input type="text" id="precio_venta" class="form-control" disabled>
-                    </div>
-                </div>
-
-            </div>
-
-            <button style="float: right" class="btn btn-primary" id="btn_registrar_carrito">Registrar</button>
-            <div id="respuesta_carrito"></div>
+                <button style="float: right" class="btn btn-primary" id="btn_registrar_carrito">Registrar</button>
+                <div id="respuesta_carrito"></div>
 
                 <script>
                     $('#btn_registrar_carrito').click(function () {
@@ -591,37 +572,37 @@ include('../layout/parte2.php');
                         }
                     });
                 </script>
+            </div>
+            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-content -->
+        <!-- /.modal-dialog -->
     </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
+    <!-- /.modal -->
 
 
 
-<script>
-    $(function () {
+    <script>
+        $(function () {
 
-        $("#prods").DataTable({
-            "responsive": true,"paging": true,"lengthChange": false, "autoWidth": false,
-            "pageLength": 7,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#prodss_wrapper .col-md-6:eq(0)');
-
-
-
-    });
-
-    $(function () {
-
-        $("#clientes").DataTable({
-            "responsive": true,"paging": true,"lengthChange": false, "autoWidth": false,
-            "pageLength": 7,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#prodss_wrapper .col-md-6:eq(0)');
+            $("#prods").DataTable({
+                "responsive": true,"paging": true,"lengthChange": false, "autoWidth": false,
+                "pageLength": 7,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#prodss_wrapper .col-md-6:eq(0)');
 
 
 
-    });
-</script>
+        });
+
+        $(function () {
+
+            $("#clientes").DataTable({
+                "responsive": true,"paging": true,"lengthChange": false, "autoWidth": false,
+                "pageLength": 7,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#prodss_wrapper .col-md-6:eq(0)');
+
+
+
+        });
+    </script>

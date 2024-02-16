@@ -49,7 +49,7 @@ include('../app/controllers/ventas/listado_de_ventas.php');
 
                             <div class="card-tools">
                                 <a href="<?php echo $URL;?>/ventas/create.php" class="mr-4">Nuevo</a>
-                                <a href="<?php echo $URL;?>/ventas/create.php" class="mr-4">Version PDF</a>
+                                <a href="<?php echo $URL;?>/#" class="mr-4">Version PDF</a>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
                                 </button>
                             </div>
@@ -80,7 +80,7 @@ include('../app/controllers/ventas/listado_de_ventas.php');
                                     $contador = $contador + 1;
                                     ?>
                                     <tr>
-                                        <td><center><?php echo $ventas_dato['id_venta']; ?></center></td>
+                                        <td><center><?php echo $ventas_dato['nro_venta']; ?></center></td>
                                         <td>
                                             <center>
                                                 <button class="btn btn-primary"
@@ -207,8 +207,8 @@ include('../app/controllers/ventas/listado_de_ventas.php');
 
                                         <td>
                                             <center>
-                                                <a href="show.php?id="> Ver /</a>
-                                                <a href="delete.php?id="> Eliminar </a>
+                                                <a href="show.php?id_venta=<?php echo $id_venta; ?>"> Ver /</a>
+                                                <a href="delete.php?id_venta=<?php echo $id_venta; ?>"> Eliminar </a>
                                             </center>
                                         </td>
                                     </tr>
@@ -247,6 +247,7 @@ include('../app/controllers/ventas/listado_de_ventas.php');
 
         $("#ventas").DataTable({
             "responsive": true,"paging": true,"lengthChange": false, "autoWidth": false,
+            "order": [[0, 'desc']],
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#prodss_wrapper .col-md-6:eq(0)');
 
