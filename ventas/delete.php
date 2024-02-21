@@ -1,5 +1,7 @@
 <?php
 $id_venta_get = $_GET['id_venta'];
+$nro_venta_get = $_GET['nro_venta'];
+
 include('../app/config.php');
 include('../layout/sesion.php');
 
@@ -91,6 +93,7 @@ include('../app/controllers/clientes/cargar_cliente.php');
                                     <thead>
                                     <tr>
                                         <th class="tbl_prods">Nro</th>
+                                        <th class="tbl_prods">Codigo</th>
                                         <th class="tbl_prods">Producto</th>
                                         <th class="tbl_prods">Cantidad</th>
                                         <th class="tbl_prods">Precio Unitario</th>
@@ -122,6 +125,7 @@ include('../app/controllers/clientes/cargar_cliente.php');
                                                 <center><?php echo $contador_de_carrito; ?></center>
                                                 <input type="text" value="<?php echo $carrito_dato['id_producto']; ?>" id="id_producto<?php echo $contador_de_carrito; ?>"hidden>
                                             </td>
+                                            <td><?php echo $carrito_dato['codigo']; ?></td>
                                             <td><?php echo $carrito_dato['nombre_producto']; ?></td>
                                             <td>
                                                 <center>
@@ -150,7 +154,7 @@ include('../app/controllers/clientes/cargar_cliente.php');
                                     }
                                     ?>
                                     <tr>
-                                        <th class="tbl_prods_total_text" colspan="2">Total</th>
+                                        <th class="tbl_prods_total_text" colspan="3">Total</th>
 
                                         <th class="tbl_prods_total">
                                             <?php echo $cantidad_total; ?>
@@ -291,8 +295,13 @@ include('../app/controllers/clientes/cargar_cliente.php');
                                 $('#btn_borrar_venta').click(function () {
 
                                     var id_venta = '<?php echo $id_venta_get; ?>';
+                                    var nro_venta = '<?php echo $nro_venta_get; ?>';
+
+                                    actualizar_stock();
+                                    borrar_venta();
 
                                     function actualizar_stock() {
+
                                         var i = 1;
                                         var n = '<?php echo $contador_de_carrito; ?>';
 
@@ -306,21 +315,23 @@ include('../app/controllers/clientes/cargar_cliente.php');
                                             var c = '#id_producto'+i;
                                             var id_producto = $(c).val();
 
-                                            var stock_calculado = parseFloat(stock_de_inventario - cantidad_carrito);
+                                            var stock_calculado = parseFloat(parseInt(stock_de_inventario) + parseInt(cantidad_carrito));
                                             //alert(id_producto+" - "+stock_de_inventario +" - "+cantidad_carrito+" - "+stock_calculado);
 
                                             var url2 = "../app/controllers/ventas/actualizar_stock.php";
                                             $.get(url2,{id_producto:id_producto,stock_calculado:stock_calculado},function (datos) {
-                                                $('#respuesta_registro_venta').html(datos);
+                                                //$('#respuesta_registro_venta').html(datos);
                                             });
                                         }
                                     }
 
-                                    var url = "../app/controllers/ventas/borrar_venta.php";
-                                    $.get(url,{id_venta:id_venta},function (datos) {
-                                        $('#btn_borrar_venta').html(datos);
-                                    });
-                                    //alert(id_venta);
+                                    function borrar_venta() {
+                                        var url = "../app/controllers/ventas/borrar_venta.php";
+                                        $.get(url,{id_venta:id_venta,nro_venta:nro_venta},function (datos) {
+                                            $('#btn_borrar_venta').html(datos);
+                                        });
+                                    }
+
                                 });
                             </script>
 

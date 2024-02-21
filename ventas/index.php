@@ -208,7 +208,8 @@ include('../app/controllers/ventas/listado_de_ventas.php');
                                         <td>
                                             <center>
                                                 <a href="show.php?id_venta=<?php echo $id_venta; ?>"> Ver /</a>
-                                                <a href="delete.php?id_venta=<?php echo $id_venta; ?>"> Eliminar </a>
+                                                <a href="delete.php?id_venta=<?php echo $id_venta; ?>&nro_venta=<?php echo $nro_venta; ?>"> Eliminar / </a>
+                                                <a href="factura.php?id_venta=<?php echo $id_venta; ?>&nro_venta=<?php echo $nro_venta; ?>"> Factura </a>
                                             </center>
                                         </td>
                                     </tr>

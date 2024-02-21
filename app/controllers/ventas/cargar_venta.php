@@ -10,6 +10,8 @@ $query_ventas->execute();
 $ventas_datos = $query_ventas->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($ventas_datos as $ventas_dato) {
+
     $nro_venta = $ventas_dato['nro_venta'];
     $id_cliente = $ventas_dato['id_cliente'];
+
 }

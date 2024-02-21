@@ -150,10 +150,45 @@ include('app/controllers/compras/listado_de_compras.php');
 
                 </div>
 
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+
+                            <p>Ventas Registradas</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-cart-plus"></i>
+                        </div>
+                        <a href="<?php echo $URL;?>/compras" class="small-box-footer">
+                            Mas detalle <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+
+
+                            <p>Clientes Registrados</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-cart-plus"></i>
+                        </div>
+                        <a href="<?php echo $URL;?>/compras" class="small-box-footer">
+                            Mas detalle <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+
+                </div>
+
+
+
 
 
             </div>
             <!-- /.row -->
+
+
 
 
 

@@ -113,6 +113,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                     <thead>
                                     <tr>
                                         <th class="tbl_prods">Nro</th>
+                                        <th class="tbl_prods">Codigo</th>
                                         <th class="tbl_prods">Producto</th>
                                         <th class="tbl_prods">Cantidad</th>
                                         <th class="tbl_prods">Precio Unitario</th>
@@ -146,6 +147,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                                 <center><?php echo $contador_de_carrito; ?></center>
                                                 <input type="text" value="<?php echo $carrito_dato['id_producto']; ?>" id="id_producto<?php echo $contador_de_carrito; ?>"hidden>
                                             </td>
+                                            <td><?php echo $carrito_dato['codigo']; ?></td>
                                             <td><?php echo $carrito_dato['nombre_producto']; ?></td>
                                             <td>
                                                 <center>
@@ -183,7 +185,7 @@ include('../app/controllers/clientes/listado_de_clientes.php');
                                     }
                                     ?>
                                     <tr>
-                                        <th class="tbl_prods_total_text" colspan="2">Total</th>
+                                        <th class="tbl_prods_total_text" colspan="3">Total</th>
 
                                         <th class="tbl_prods_total">
                                             <?php echo $cantidad_total; ?>
